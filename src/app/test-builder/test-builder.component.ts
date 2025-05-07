@@ -1,7 +1,11 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {InjectionScript} from '../core/scripts/injection-script'
-import {DomSanitizer, EventManager, SafeResourceUrl, SafeUrl} from "@angular/platform-browser";
-import {environment} from "../../environments/environment";
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { InjectionScript } from '../core/scripts/injection-script'
+import { DomSanitizer, EventManager, SafeResourceUrl, SafeUrl } from "@angular/platform-browser";
+import { environment } from "../../environments/environment";
+import { IconNamesEnum } from 'ngx-bootstrap-icons';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateTestCaseComponent } from './create-test-case/create-test-case.component';
+
 
 @Component({
   selector: 'app-test-builder',
@@ -11,13 +15,15 @@ import {environment} from "../../environments/environment";
 export class TestBuilderComponent implements OnInit, AfterViewInit {
   targetUrl = 'https://d3tsi0wyyqncdr.cloudfront.net/';
 
-  @ViewChild('frame', {static: true})
+  @ViewChild('frame', { static: true })
   frame!: ElementRef<HTMLIFrameElement>;
   trustedUrl: SafeResourceUrl | undefined;
-
+  public iconNames = IconNamesEnum;
   constructor(
     private sanitizer: DomSanitizer,
-    private eventManager: EventManager) {
+    private eventManager: EventManager,
+    private matDialog: MatDialog
+  ) {
   }
 
   ngOnInit() {
@@ -28,8 +34,8 @@ export class TestBuilderComponent implements OnInit, AfterViewInit {
     this.frame.nativeElement.addEventListener('load', () => {
       // enable the picker
       // const enablePicker = () => {
-    console.log(this.frame)
-        this.frame.nativeElement.contentWindow?.postMessage({ type: 'ELEMENT_PICKER_TOGGLE', active: true }, '*');
+      console.log(this.frame)
+      this.frame.nativeElement.contentWindow?.postMessage({ type: 'ELEMENT_PICKER_TOGGLE', active: true }, '*');
       // }
 
       // disable (or cancel) the picker
@@ -48,4 +54,10 @@ export class TestBuilderComponent implements OnInit, AfterViewInit {
       });
     });
   }
+  openCreateTestCaseModal() {
+    const dialog = this.matDialog.open(CreateTestCaseComponent, {
+
+    })
+  }
+
 }

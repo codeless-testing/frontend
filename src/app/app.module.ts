@@ -3,9 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {Route, RouterModule} from "@angular/router";
+import { Route, RouterModule } from "@angular/router";
 import { LayoutComponent } from './core/layout/layout.component';
 
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons';
 
 const router: Route[] = [
   {
@@ -27,7 +28,8 @@ const router: Route[] = [
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    RouterModule.forRoot(router)
+    RouterModule.forRoot(router),
+    NgxBootstrapIconsModule.pick(allIcons)
   ],
   bootstrap: [AppComponent]
 })

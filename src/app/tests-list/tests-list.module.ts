@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TestsListComponent } from './tests-list.component';
-import {RouterModule, Routes} from "@angular/router";
+import { RouterModule, Routes } from "@angular/router";
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons';
 
 const routes: Routes = [
   {
@@ -16,7 +17,8 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    NgxBootstrapIconsModule.pick(allIcons),
   ]
 })
 export class TestsListModule { }
