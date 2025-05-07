@@ -1,17 +1,17 @@
 <div class="rows">
   <div class="row row-left">
 
-    <div class="test-case">
+    <div class="test-case" *ngIf="data">
 
       <div class="test-subtitle">
         <span class="test-item">
           <i-bs name="briefcase" class="test-icon"></i-bs>
-          <b>Test case:</b> UI-Links
+          <b>Test case:</b> {{data.name}}
         </span>
         <span class="test-item">
           <i-bs name="key" class="test-icon"></i-bs>
-          <b>Case ID:</b> 
-          438573544385
+          <b>Case ID:</b>
+          {{data._id}}
         </span>
         <span class="test-item">
           <i-bs name="link-45deg" class="test-icon"></i-bs>
@@ -66,7 +66,7 @@
       <button (click)="openCreateTestCaseModal()">click</button>
 
     </div>
-    
+
   </div>
 
   <div class="row row-right">
@@ -76,7 +76,7 @@
           <div class="task_btn_close"></div>
           <div class="task_btn_minimize"></div>
           <div class="task_btn_open"></div>
-        </div>          
+        </div>
       </div>
       <iframe class="builder-iframe" #frame [src]="trustedUrl"></iframe>
     </div>

@@ -1,3 +1,3 @@
 export const environment = {
-  proxyUrl: 'http://localhost:3000',
+  apiUrl: 'https://api.codeless-tests.com/',
 };

@@ -14,7 +14,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 
 const routes: Routes = [
   {
-    path: '',
+    path: ':id',
     component: TestBuilderComponent
   }
 ]

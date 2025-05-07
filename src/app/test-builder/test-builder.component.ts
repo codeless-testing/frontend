@@ -5,6 +5,10 @@ import { environment } from "../../environments/environment";
 import { IconNamesEnum } from 'ngx-bootstrap-icons';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateTestCaseComponent } from './create-test-case/create-test-case.component';
+import {ActivatedRoute} from "@angular/router";
+import {CasesService} from "../core/services/cases.service";
+import {CasesModel} from "../core/models/cases.model";
+import {Subject, takeUntil} from "rxjs";
 
 
 @Component({
@@ -14,6 +18,10 @@ import { CreateTestCaseComponent } from './create-test-case/create-test-case.com
 })
 export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
   targetUrl = 'https://d3tsi0wyyqncdr.cloudfront.net';
+  casesId: string = '';
+  data: CasesModel | null = null;
+
+  $onDestroy: Subject<void> = new Subject<void>();
 
   @ViewChild('frame', { static: true }) frame!: ElementRef<HTMLIFrameElement>;
 
@@ -24,12 +32,20 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private zone: NgZone,
     private eventManager: EventManager,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private activeRoute: ActivatedRoute,
+    private casesService: CasesService,
   ) {
   }
 
   ngOnInit() {
+    this.casesId = this.activeRoute.snapshot.params['id'];
+    this.getData();
     this.trustedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.targetUrl);
+  }
+
+  getData(){
+    this.casesService.getCasesById(this.casesId).pipe(takeUntil(this.$onDestroy)).subscribe((res) => this.data = res);
   }
 
 
@@ -73,6 +89,7 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('message', this.onMessage);
+    this.$onDestroy.complete();
   }
 
 }

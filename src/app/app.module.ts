@@ -7,6 +7,7 @@ import { Route, RouterModule } from "@angular/router";
 import { LayoutComponent } from './core/layout/layout.component';
 
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons';
+import {HttpClientModule} from "@angular/common/http";
 
 const router: Route[] = [
   {
@@ -27,6 +28,7 @@ const router: Route[] = [
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(router),
     NgxBootstrapIconsModule.pick(allIcons)
