@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { InjectionScript } from '../core/scripts/injection-script'
 import { DomSanitizer, EventManager, SafeResourceUrl, SafeUrl } from "@angular/platform-browser";
 import { environment } from "../../environments/environment";
@@ -12,15 +12,17 @@ import { CreateTestCaseComponent } from './create-test-case/create-test-case.com
   templateUrl: './test-builder.component.html',
   styleUrls: ['./test-builder.component.scss']
 })
-export class TestBuilderComponent implements OnInit, AfterViewInit {
-  targetUrl = 'https://d3tsi0wyyqncdr.cloudfront.net/';
+export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
+  targetUrl = 'https://d3tsi0wyyqncdr.cloudfront.net';
 
-  @ViewChild('frame', { static: true })
-  frame!: ElementRef<HTMLIFrameElement>;
+  @ViewChild('frame', { static: true }) frame!: ElementRef<HTMLIFrameElement>;
+
+  private readonly onMessage = this.handleMessage.bind(this);
   trustedUrl: SafeResourceUrl | undefined;
   public iconNames = IconNamesEnum;
   constructor(
     private sanitizer: DomSanitizer,
+    private zone: NgZone,
     private eventManager: EventManager,
     private matDialog: MatDialog
   ) {
@@ -30,34 +32,47 @@ export class TestBuilderComponent implements OnInit, AfterViewInit {
     this.trustedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.targetUrl);
   }
 
+
   ngAfterViewInit(): void {
+    /* 1️⃣  add the listener FIRST, outside of `load` */
+    window.addEventListener('message', this.onMessage);
+
+    /* 2️⃣  wait for the iframe to load, then talk to it */
     this.frame.nativeElement.addEventListener('load', () => {
-      // enable the picker
-      // const enablePicker = () => {
-      console.log(this.frame)
-      this.frame.nativeElement.contentWindow?.postMessage({ type: 'ELEMENT_PICKER_TOGGLE', active: true }, '*');
-      // }
-
-      // disable (or cancel) the picker
-      // const disablePicker = () => {
-      //   this.frame.nativeElement?.contentWindow?postMessage({ type: 'ELEMENT_PICKER_TOGGLE', active: false }, '*');
-      // }
-
-      // listen for the element‑selected event bubbling out of the iframe
-      window.addEventListener('message', (e: any) => {
-        if (e.data.type === 'element-selected') {
-
-          console.log('User picked:', e);
-          const html = this.sanitizer.bypassSecurityTrustHtml(e.outerHTML);
-          console.log(html)
-        }
-      });
+      this.frame.nativeElement.contentWindow!.postMessage(
+        { type: 'ELEMENT_PICKER_TOGGLE', active: true },
+        this.targetUrl          // never use '*' in production
+      );
     });
   }
+
+  private handleMessage(e: MessageEvent): void {
+    /* 3️⃣  accept only messages that really come from our iframe */
+    // if (
+    //   e.origin !== this.targetUrl ||
+    //   e.source !== this.frame.nativeElement.contentWindow
+    // ) {
+    //   return;                                    // ignore everything else
+    // }
+
+    if (e.data?.type === 'element-selected') {
+      console.log(e.data)
+      /* 4️⃣  hop back into Angular’s zone so change detection runs */
+      this.zone.run(() => {
+        const html = this.sanitizer.bypassSecurityTrustHtml(e.data.detail.outerHTML);
+        console.log('User picked:', html);
+      });
+    }
+  }
+
   openCreateTestCaseModal() {
     const dialog = this.matDialog.open(CreateTestCaseComponent, {
 
     })
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('message', this.onMessage);
   }
 
 }
