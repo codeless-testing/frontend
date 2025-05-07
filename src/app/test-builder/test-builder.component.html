@@ -1,8 +1,86 @@
 <div class="rows">
-  <div class="row">
-    <h1>Hello world</h1>
+  <div class="row row-left">
+
+    <div class="test-case">
+
+      <div class="test-subtitle">
+        <span class="test-item">
+          <i-bs name="briefcase" class="test-icon"></i-bs>
+          <b>Test case:</b> UI-Links
+        </span>
+        <span class="test-item">
+          <i-bs name="key" class="test-icon"></i-bs>
+          <b>Case ID:</b> 
+          438573544385
+        </span>
+        <span class="test-item">
+          <i-bs name="link-45deg" class="test-icon"></i-bs>
+          <b>Case Url: </b>
+          <a href="#">google.com</a>
+        </span>
+      </div>
+
+      <mat-stepper orientation="vertical">
+        <mat-step>
+          <ng-template matStepLabel>Step 1</ng-template>
+          <ng-template matStepContent>
+            <p>This content was rendered lazily</p>
+            <button mat-button matStepperNext>Next</button>
+          </ng-template>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 2</ng-template>
+          <ng-template matStepContent>
+            <p>This content was also rendered lazily</p>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Next</button>
+          </ng-template>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 3</ng-template>
+          <p>This content was rendered eagerly</p>
+          <button mat-button matStepperPrevious>Back</button>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 4</ng-template>
+          <p>This content was rendered eagerly</p>
+          <button mat-button matStepperPrevious>Back</button>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 5</ng-template>
+          <p>This content was rendered eagerly</p>
+          <button mat-button matStepperPrevious>Back</button>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 6</ng-template>
+          <p>This content was rendered eagerly</p>
+          <button mat-button matStepperPrevious>Back</button>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Step 7</ng-template>
+          <p>This content was rendered eagerly</p>
+          <button mat-button matStepperPrevious>Back</button>
+        </mat-step>
+      </mat-stepper>
+
+      <button (click)="openCreateTestCaseModal()">click</button>
+
+    </div>
+    
   </div>
-  <div class="row">
-    <iframe #frame [src]="trustedUrl"></iframe>
+
+  <div class="row row-right">
+    <div class="test-frame">
+      <div class="task_bar">
+        <div class="task_btn">
+          <div class="task_btn_close"></div>
+          <div class="task_btn_minimize"></div>
+          <div class="task_btn_open"></div>
+        </div>          
+      </div>
+      <iframe class="builder-iframe" #frame [src]="trustedUrl"></iframe>
+    </div>
   </div>
+
 </div>
+
