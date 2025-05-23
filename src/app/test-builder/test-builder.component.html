@@ -1,6 +1,9 @@
 <div class="rows">
   <div class="row row-left">
 
+    {{html}}
+
+
     <div class="test-case" *ngIf="data">
 
       <div class="test-subtitle">
@@ -77,6 +80,12 @@
           <div class="task_btn_minimize"></div>
           <div class="task_btn_open"></div>
         </div>
+      </div>
+      <div class="navigation">
+
+        <button mat-button class="button" *ngIf="!isInspectorActive" (click)="activeInspect()">Active inspector</button>
+        <button mat-button class="button" *ngIf="isInspectorActive" (click)="disableInspect()">Disable inspector</button>
+<!--        <input type="text" [value]="getIframeSrc()" (ngModelChange)="updateChanges()">-->
       </div>
       <iframe class="builder-iframe" #frame [src]="trustedUrl"></iframe>
     </div>

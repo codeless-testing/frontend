@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons';
 import { CreateTestCaseComponent } from './create-test-case/create-test-case.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {MatButtonModule} from "@angular/material/button";
 
 
 
@@ -33,7 +35,10 @@ const routes: Routes = [
     MatStepperModule,
     MatIconModule,
     NgxBootstrapIconsModule.pick(allIcons),
-    MatDialogModule
+    MatDialogModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatButtonModule
   ],
 })
 export class TestBuilderModule { }

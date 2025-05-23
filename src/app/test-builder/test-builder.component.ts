@@ -8,7 +8,7 @@ import { CreateTestCaseComponent } from './create-test-case/create-test-case.com
 import {ActivatedRoute} from "@angular/router";
 import {CasesService} from "../core/services/cases.service";
 import {CasesModel} from "../core/models/cases.model";
-import {Subject, takeUntil} from "rxjs";
+import {fromEvent, skip, Subject, takeUntil} from "rxjs";
 
 
 @Component({
@@ -17,9 +17,10 @@ import {Subject, takeUntil} from "rxjs";
   styleUrls: ['./test-builder.component.scss']
 })
 export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
-  targetUrl = 'https://d3tsi0wyyqncdr.cloudfront.net';
+  targetUrl = 'https://staging.d1dw0ba7wgect1.amplifyapp.com/auth/login';
   casesId: string = '';
   data: CasesModel | null = null;
+  html: any;
 
   $onDestroy: Subject<void> = new Subject<void>();
 
@@ -28,6 +29,8 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly onMessage = this.handleMessage.bind(this);
   trustedUrl: SafeResourceUrl | undefined;
   public iconNames = IconNamesEnum;
+  iframePath: any;
+  isInspectorActive: boolean = false;
   constructor(
     private sanitizer: DomSanitizer,
     private zone: NgZone,
@@ -54,12 +57,32 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     window.addEventListener('message', this.onMessage);
 
     /* 2️⃣  wait for the iframe to load, then talk to it */
-    this.frame.nativeElement.addEventListener('load', () => {
-      this.frame.nativeElement.contentWindow!.postMessage(
-        { type: 'ELEMENT_PICKER_TOGGLE', active: true },
-        this.targetUrl          // never use '*' in production
-      );
+    this.frame.nativeElement.addEventListener('message', (event) => {
+      console.log(event)
     });
+
+    fromEvent(this.frame.nativeElement, 'load')
+      // Skip the initial load event and only capture subsequent events.
+      .pipe(skip(1))
+      .subscribe((event: Event) => {
+        this.iframePath = event.target
+      });
+  }
+
+  activeInspect() {
+    this.isInspectorActive = true;
+    this.frame.nativeElement.contentWindow!.postMessage(
+      { type: 'ELEMENT_PICKER_TOGGLE', active: true },
+      this.targetUrl          // never use '*' in production
+    );
+  }
+
+  disableInspect() {
+    this.isInspectorActive = false;
+    this.frame.nativeElement.contentWindow!.postMessage(
+      { type: 'ELEMENT_PICKER_TOGGLE', active: false },
+      this.targetUrl          // never use '*' in production
+    );
   }
 
   private handleMessage(e: MessageEvent): void {
@@ -75,10 +98,28 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log(e.data)
       /* 4️⃣  hop back into Angular’s zone so change detection runs */
       this.zone.run(() => {
-        const html = this.sanitizer.bypassSecurityTrustHtml(e.data.detail.outerHTML);
-        console.log('User picked:', html);
+
+        const rawHtml = e.data.detail.outerHTML;
+        const tag = e.data.detail.tag;
+
+        const parser = new DOMParser();
+        const doc    = parser.parseFromString(rawHtml, 'text/html');
+
+        this.getDataFromIframe(doc.body, tag)
       });
     }
+  }
+
+  getDataFromIframe(data: any, tag: string) {
+    const div = data.firstElementChild as HTMLElement;
+    const className= div.className;
+
+    console.log('User picked:', {
+      className,
+      tag
+    });
+    this.html = className;
+    this.openCreateTestCaseModal();
   }
 
   openCreateTestCaseModal() {
@@ -92,4 +133,16 @@ export class TestBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     this.$onDestroy.complete();
   }
 
+  updateChanges() {
+
+  }
+
+  getIframeSrc() {
+    if (this.frame.nativeElement.src) {
+      // console.log(this.frame.nativeElement.contentWindow.)
+      const url = new URL(this.frame.nativeElement.src);
+      return url.pathname
+    }
+    return ''
+  }
 }
